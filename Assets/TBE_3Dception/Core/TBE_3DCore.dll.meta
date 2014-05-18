@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 81a4699eea4284491a78daf3b1e65cf1
+MonoAssemblyImporter:
+  serializedVersion: 1
+  iconMap: {}
+  executionOrder:
+    TBE_3DCore.TBE_GlobalListener: -100
+    TBE_3DCore.TBE_RoomProperties: -50
+  userData: 

@@ -5,63 +5,48 @@ using System.Linq;
 
 public class Taps : MonoBehaviour 
 {
-
-	bool tapped = false;
+	public static bool Tapped {get; set;}
 
 	// Tap calculation variables 
-	int starti = 3;
-	int currenti = starti;
-	int savedmax = 0;
-	int dadtmultiple = 4;
-	int minselectmag = 1;
-	int numAccelerationSamples = 6;
-	Queue<int> yAccels = new Queue<int>();
-	List<int> dadtvalues = new List<int>();
-
-	// Tap strength variables
-	int tapAccelMultiplier = 5;
-	int tapDisableTicks = 0;
-	int tapDisableLength = 10;
+	public float Dadtmultiple = 4;
+	public int Minselectmag = 1;
+	public int NumAccelerationSamples = 6;
+	public Queue<float> YAccels = new Queue<float>();
+	public List<float> Dadtvalues = new List<float>();
 
 	// 
-	int lastXAccel = 0;
-	int lastYAccel = 0;
-	int lastZAccel = 0;
-
-	// Use this for initialization
-	void Start () 
-	{
-
-
-	
-	}
+	private float lastXAccel = 0;
+	private float lastYAccel = 0;
+	private float lastZAccel = 0;
 
 	void Update () 
 	{
 		//Update y accelerations
 		if (OVRDevice.GetAcceleration(0, ref lastXAccel, ref lastYAccel, ref lastZAccel))
 		{
-			yAccels.Enqueue(lastYAccel);
+			YAccels.Enqueue(lastYAccel);
 
-			if(yAccels.Count > numAccelerationSamples)
+			if(YAccels.Count > NumAccelerationSamples)
 			{
-				yAccels.Dequeue();
+				YAccels.Dequeue();
 			}
 		}
-
-
-		//Update differences
-		dadtvalues.Clear();
-		for (int i = 1; i < yAccels.Count; i++)
+		if(YAccels.Count == NumAccelerationSamples)
 		{
-			dadtvalues[i-1] = yAccels[i] - yAccels[i-1];
+
+			//Update differences
+			Dadtvalues.Clear();
+
+			for (int i = 1; i < YAccels.Count; i++)
+			{
+				Dadtvalues.Add(YAccels.ElementAt(i) - YAccels.ElementAt(i-1));
+			}
+
+			//Check for taps
+			float avg = Dadtvalues.Average((val) => Mathf.Abs(val));
+			Tapped = Dadtvalues.Any(val => Mathf.Abs(val) > avg * Dadtmultiple && Mathf.Abs(val) > Minselectmag); 
+
 		}
-
-		//Check for taps
-		int avg = dadtvalues.Average();
-		tapped = dadtvalues.Any(val => Mathf.Abs(val) > avg * dadtmultiple && Mathf.Abs(val) > minselectmag) 
-
 	}
-
 
 }
